@@ -5,19 +5,21 @@ import java.sql.PreparedStatement;
 
 public class Logging {
 
-    public static void logTransaction(String cardNumber, String type, double amount) {
+    public static void logTransaction(String cardNumber, String type, double amount, int userId) {
         Connection conn = null;
         PreparedStatement stmt = null;
         try {
             conn = DatabaseConnection.getConnection();
 
-            String sql = "INSERT INTO Transactions (AccountNumber, CardNumber, TransactionType, Amount, Timestamp) VALUES ((SELECT AccountNumber FROM Cards WHERE CardNumber = ?), ?, ?, ?, NOW())";
+            String sql = "INSERT INTO Transactions (AccountNumber, CardNumber, TransactionType, Amount, UserID, Timestamp) " +
+                    "VALUES ((SELECT AccountNumber FROM Cards WHERE CardNumber = ?), ?, ?, ?, ?, NOW())";
             stmt = conn.prepareStatement(sql);
             stmt.setString(1, cardNumber);
             stmt.setString(2, cardNumber);
-
             stmt.setString(3, type);
             stmt.setDouble(4, amount);
+            stmt.setInt(5, userId); // Include userID in the log
+
             stmt.executeUpdate();
 
         } catch (Exception e) {
@@ -32,4 +34,3 @@ public class Logging {
         }
     }
 }
-
