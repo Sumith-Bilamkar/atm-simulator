@@ -31,8 +31,19 @@ public class CashWithdrawal {
                     stmt.setString(2, cardNumber);
                     stmt.executeUpdate();
 
+                    // Get userID
+                    String userIdSql = "SELECT UserID FROM Cards WHERE CardNumber = ?";
+                    stmt = conn.prepareStatement(userIdSql);
+                    stmt.setString(1, cardNumber);
+                    rs = stmt.executeQuery();
+
+                    int userId = -1;
+                    if (rs.next()) {
+                        userId = rs.getInt("UserID");
+                    }
+
                     // Log transaction
-                    Logging.logTransaction(cardNumber, "Withdrawal", amount);
+                    Logging.logTransaction(cardNumber, "Withdrawal", amount, userId);
 
                     System.out.println("Withdrawal successful! Amount withdrawn: " + amount);
                 } else {
